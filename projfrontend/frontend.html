@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real-Time Stock Price Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif; background-color: #f0f2f5; color: #333; margin: 0; padding: 20px; }
+        .container { max-width: 900px; margin: auto; background-color: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        h1 { text-align: center; color: #005A9E; }
+        #status { text-align: center; font-style: italic; color: #666; height: 20px; }
+        .chart-container { position: relative; height: 40vh; width: 100%; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Real-Time MSFT Stock Price (5-Min Average)</h1>
+        <p id="status">Loading data...</p>
+        <div class="chart-container">
+            <canvas id="stockChart"></canvas>
+        </div>
+    </div>
+
+    <script>
+        // IMPORTANT: Replace this with the URL of your 'GetDataForDashboard' function
+        const API_URL = 'https://func-py-stock-producer-cldprj.azurewebsites.net/api/get-latest-data?code=YOUR_FUNCTION_KEY';
+
+        const statusElement = document.getElementById('status');
+        const ctx = document.getElementById('stockChart').getContext('2d');
+        let stockChart;
+
+        function formatDataForChart(apiData) {
+            // Sort data by timestamp just in case it's out of order
+            apiData.sort((a, b) => new Date(a.WindowEndTime) - new Date(b.WindowEndTime));
+            
+            const labels = apiData.map(d => new Date(d.WindowEndTime).toLocaleTimeString());
+            const dataPoints = apiData.map(d => d.AveragePrice);
+            
+            return { labels, dataPoints };
+        }
+
+        function renderChart(labels, dataPoints) {
+            if (stockChart) {
+                stockChart.destroy();
+            }
+
+            // --- NEW LOGIC TO STABILIZE THE Y-AXIS ---
+            const minPrice = Math.min(...dataPoints);
+            const maxPrice = Math.max(...dataPoints);
+            
+            // Calculate a buffer (e.g., 1% of the average price) to make the y-axis less sensitive.
+            // This prevents tiny price changes from looking like huge slopes.
+            const averagePrice = (minPrice + maxPrice) / 2;
+            const buffer = averagePrice * 0.01; // 1% buffer is a good starting point
+
+            // Ensure the buffer is at least a certain amount, e.g., $1, for very stable stocks
+            const finalBuffer = Math.max(buffer, 1); 
+
+            const yAxisMin = Math.floor(minPrice - finalBuffer);
+            const yAxisMax = Math.ceil(maxPrice + finalBuffer);
+
+            stockChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: '5-Min Average Price (USD)',
+                        data: dataPoints,
+                        borderColor: 'rgba(0, 90, 158, 1)',
+                        backgroundColor: 'rgba(0, 90, 158, 0.1)',
+                        fill: true,
+                        tension: 0.1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            // Apply the calculated min and max values to the y-axis
+                            min: yAxisMin,
+                            max: yAxisMax,
+                            ticks: {
+                                callback: function(value) {
+                                    return '$' + value.toFixed(2);
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        async function fetchData() {
+            try {
+                statusElement.textContent = 'Fetching latest data...';
+                const response = await fetch(API_URL);
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch`);
+                }
+                const data = await response.json();
+                
+                if (data && data.length > 0) {
+                    const { labels, dataPoints } = formatDataForChart(data);
+                    renderChart(labels, dataPoints);
+                    statusElement.textContent = `Last updated: ${new Date().toLocaleTimeString()}`;
+                } else {
+                    statusElement.textContent = 'No data available yet. Waiting for the first processing window to complete...';
+                }
+            } catch (error) {
+                console.error('Error fetching data:', error);
+                statusElement.textContent = `Error: ${error.message}`;
+            }
+        }
+
+        // Fetch data immediately on page load, and then every 30 seconds
+        fetchData();
+        setInterval(fetchData, 30000); 
+    </script>
+</body>
+</html>
