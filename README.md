@@ -2,8 +2,6 @@
 
 A complete, serverless, event-driven data pipeline built on Microsoft Azure to ingest, process, and visualize real-time stock price data. This project was undertaken to gain hands-on experience with modern, full-stack cloud architecture for handling and presenting streaming data.
 
-![Architecture Diagram](architecture.png)
-
 ## 🎯 Project Goal & Learning Objectives
 
 In the world of financial services, the ability to process and act on market data in real-time is crucial. **This project was designed as a deep dive into cloud architecture to learn how to solve this challenge.** The primary learning objective was to design and build a fully serverless pipeline that could fetch live stock prices, perform time-series calculations (like a 5-minute moving average), and display the results on a live-updating web dashboard, all while adhering to cloud best practices like security and cost-effectiveness.
