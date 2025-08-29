@@ -30,3 +30,5 @@ In the world of financial services, the ability to process and act on market dat
 **As a learning project, the challenges encountered were the most valuable part of the experience.** A key challenge was debugging authentication and permission issues between services, which provided a deep understanding of Azure's identity and access management (IAM) and the importance of Managed Identities. A major success was building a resilient custom frontend and a secure API, demonstrating the ability to connect backend data processing with a user-facing application that can handle real-world API downtime. Writing the Stream Analytics query to use `TumblingWindow` was also a key learning for performing time-series analysis.
 
 ---
+# Architecture Diagram
+![Architecture Diagram](http://url/to/img.png](https://lucid.app/publicSegments/view/4777dbde-7768-4eeb-b368-4c5194778a84/image.png)
