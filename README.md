@@ -31,4 +31,4 @@ In the world of financial services, the ability to process and act on market dat
 
 ---
 # Architecture Diagram
-![Architecture Diagram](http://url/to/img.png](https://lucid.app/publicSegments/view/4777dbde-7768-4eeb-b368-4c5194778a84/image.png)
+![Architecture Diagram](https://lucid.app/publicSegments/view/4777dbde-7768-4eeb-b368-4c5194778a84/image.png)
