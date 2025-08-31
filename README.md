@@ -32,3 +32,7 @@ In the world of financial services, the ability to process and act on market dat
 ---
 # Architecture Diagram
 ![Architecture Diagram](https://lucid.app/publicSegments/view/4777dbde-7768-4eeb-b368-4c5194778a84/image.png)
+
+# Results
+Note : The graph fluctuations in the results shown show same values in the y axis due to only a few cents changing in the MSFT stock
+![Results](https://lucid.app/publicSegments/view/6725c881-754b-4f95-a583-bb63ebe3afb9/image.png)
